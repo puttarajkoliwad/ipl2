@@ -1,3 +1,14 @@
+let chosenYear = 0;
+let dataLocal = {};
+function getYear(){
+  const yr = document.getElementById('year').value;
+  chosenYear = yr;
+  console.log('Year selected: ' + yr);
+  visualizeTeamExtras(dataLocal.teamExtras);
+  
+  
+}
+
 function fetchAndVisualizeData() {
   fetch("./data.json")
     .then(r => r.json())
@@ -8,19 +19,63 @@ fetchAndVisualizeData();
 
 function visualizeData(data) {
   
+  dataLocal = data;
   visualizeMatchesPlayedPerYear(data.matchesPlayedPerYear);
-  visualizeTeamExtras2016(data.teamExtras2016);
   visualizeTeamWins(data.teamTotalWins);
   visualizeBestBowlers2015(data.topBowlers2015);
+  visualizeWinsPerTeamPerSeason(data.winsPerTeamPerSeason);
   visualizeSummary(data.stadiumWinsForTeams);
-  console.log(Object.keys(data));
+  
+  //console.log(Object.keys(data));
   return;
 }
+
+
+function visualizeWinsPerTeamPerSeason(obj){
+  //console.log(obj);
+  Highcharts.chart('wins-per-team-per-season', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Wins Per Team Per Season'
+    },
+    subtitle: {
+        text: 'Source: <a href="https://www.kaggle.com/nowke9/ipldata/data">IPL Dataset</a>'
+    },
+    xAxis: {
+        categories: obj.seasons,
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Wins'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: obj.series
+});
+}
+
 
 function visualizeSummary(obj){
   const seriesData = [];
   let teams = {};
-  let stadkeys = [...Object.keys(obj)];
+  //let stadkeys = [...Object.keys(obj)];
   for(let stadium in obj){
     for(let team in obj[stadium]){
       if(!teams[team]){
@@ -31,11 +86,12 @@ function visualizeSummary(obj){
       }
     }
   }
-  console.log(Object.keys(obj));
+  //console.log(Object.keys(obj));
   for(let team in teams){
     seriesData.push({'name': team, 'data':teams[team]})
   }
-  //console.log(JSON.stringify(seriesData));
+  console.log(seriesData);
+
   Highcharts.chart('summary-of-stadium-wins-for-each-team', {
     chart: {
       type: 'bar',
@@ -77,6 +133,7 @@ function visualizeSummary(obj){
   },
     series: seriesData
 });
+
   
 }
 
@@ -152,18 +209,20 @@ function visualizeBestBowlers2015(topBowlers2015){
 }
 
 
-function visualizeTeamExtras2016(teamExtras2016){
+function visualizeTeamExtras(teamExtras){
+  const teamExtrasChosen = teamExtras[chosenYear];
   const seriesData = [];
-  for(let team in teamExtras2016){
-    seriesData.push([team, teamExtras2016[team]]);
+  for(let team in teamExtrasChosen){
+    seriesData.push([team, teamExtrasChosen[team]]);
   }
+  //console.log(seriesData);
 
   Highcharts.chart("extra-runs-conceded-by-each-team-in-2016", {
     chart: {
       type: "column"
     },
     title: {
-      text: "Extra runs conceded by each team in 2016"
+      text: "Extra runs conceded by each team in "+ chosenYear
     },
     subtitle: {
       text:
