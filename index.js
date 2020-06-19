@@ -23,7 +23,8 @@ function main() {
       let preparedBowlers = prepareBowlers(rawData.economicalBowlers);
       let preparedTeamWins =prepareTeamWins(rawData.teamTotalWins);
       let preparedStadiumTeamWins = prepareStadiumTeamWins(rawData.stadiumWinsForTeams);
-      let preparedTeamExtras = prepareTeamExtras(rawData.extras2016);
+      let preparedTeamExtras = prepareTeamExtras(rawData.extras);
+      prepareTeamWinsPerSeason(rawData.winsPerTeamPerSeason);
       saveMatchesPlayedPerYear(result);
       //console.log(jsonData);
     });
@@ -31,10 +32,12 @@ function main() {
 }
 
 
-
+function prepareTeamWinsPerSeason(obj){
+  jsonData.winsPerTeamPerSeason = obj;
+}
 
 function prepareTeamExtras(obj){
-  jsonData.teamExtras2016 = obj;
+  jsonData.teamExtras = obj;
 }
 
 function prepareStadiumTeamWins(obj){
