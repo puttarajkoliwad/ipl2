@@ -1,28 +1,49 @@
 let teamMatches = {};
 let teamExtras = {};
-let teams = [];
+let teams2016 = [];
 let teamWins = {};
 let goodBowlers = {};
 let teamStadWins = {};
 let bowlers = [];
 let dels;
 let mtch;
+let mapIdYears;
+let allteams = [];
+
 
 let bigData ={
     "teamTotalWins": 0,
     'economicalBowlers': 0,
-    'extras2016':0,
-    'stadiumWinsForTeams': 0
+    'extras':0,
+    'stadiumWinsForTeams': 0,
+    'winsPerTeamPerSeason':{}
+}
+
+function yearIds(matches){
+    let yearsIds = {};
+    for(let match of matches){
+        if(!yearsIds[match.season]){
+            yearsIds[match.season] = [Number.parseInt(match.id)];
+        }
+        else{
+            if(!yearsIds[match.season].includes(match.id)){
+                yearsIds[match.season].push(Number.parseInt(match.id));
+            }
+        }
+    }
+    return yearsIds;
 }
 
 function prepareData(matches, deliveries){
         dels = deliveries;
         mtch = matches;
+        mapIdYears = yearIds(matches);
+        getMatchId(matches)
         bigData["teamTotalWins"] = getTeamWins(matches);
         bigData['economicalBowlers'] = goodBowler(deliveries, matches);
-        bigData['extras2016'] = getMatchId(matches);
+        bigData['extras'] = getSelectedYearsExtras(deliveries);
+        bigData['winsPerTeamPerSeason'] = getWinsPerTeamPerSeason(matches);
         bigData['stadiumWinsForTeams'] = getTeamWinsOfstadium(matches);
-        //console.log(bigData);
         return bigData;
 }
 
@@ -39,14 +60,72 @@ function getMatchId(matches){
         }
     }
     teamMatches = teamMatchId;
-    teams = [...Object.keys(teamMatches)];
+    teams2016 = [...Object.keys(teamMatches)];
     let xtras = getTeamExtras(dels);
     return xtras;
-    //console.log(teamMatchId);
+}
+
+function getWinsPerTeamPerSeason(matches){
+    let temp = {};
+    let res = {myteams: {}};
+    for(let match of matches){
+        res.myteams[match.winner] = 1;
+        if(!temp[match.season]){
+            temp[match.season] = {
+                [match.winner] : 1
+            }
+        }
+        else{
+            if(!temp[match.season][match.winner]){
+                temp[match.season][match.winner] = 1;
+            }
+            else{
+                temp[match.season][match.winner]++;
+            }
+        }
+    }
+    res.seasons =[...Object.keys(temp)];
+    res.series = [];
+    let allTeams = [...Object.keys(res.myteams)];
+    allteams = allTeams;
+    for(let team of allTeams){
+        let arb = [];
+        for(let season in temp){
+            if(temp[season][team]){
+                arb.push(temp[season][team]);
+            }
+            else{
+                arb.push(0);
+            }
+        }
+        res.series.push({'name':team, 'data':arb});
+    }
+    return res;
+}
+
+function getSelectedYearsExtras(deliveries){
+    let seasons =[...Object.keys(mapIdYears)];
+    let temp = {}
+    for(let season of seasons){
+        temp[season] = {};
+    }
+    for(let delivery of deliveries){
+        for(let season of seasons){
+            if(mapIdYears[season].indexOf(Number.parseInt(delivery.match_id)) >= 0){
+                if(!temp[season][delivery.bowling_team]){
+                    temp[season][delivery.bowling_team] = Number.parseInt(delivery.extra_runs);
+                }
+                else{
+                    temp[season][delivery.bowling_team] += Number.parseInt(delivery.extra_runs);
+                }
+            }
+        }
+    }
+    return temp;
 }
 
 function getTeamExtras(deliveries){
-    for(let team of teams ){
+    for(let team of teams2016 ){
         let sum = 0;
         for(let delivery of deliveries ){
             if(teamMatches[team].includes(delivery.match_id) && team == delivery.bowling_team){
@@ -55,7 +134,6 @@ function getTeamExtras(deliveries){
             }
         }
     }
-    //console.log(teamExtras);
     return teamExtras;
 }
 
@@ -64,9 +142,6 @@ function getTeamWins(matches){
         if(!teamWins[match.winner]){teamWins[match.winner] = 1;}
         else teamWins[match.winner]++;
     }
-    //console.log(teamWins);
-    
-    //console.log(teamWins);
     return teamWins;
 }
 
@@ -78,7 +153,6 @@ function goodBowler(deliveries, matches){
             matchID2015.push(mch.id);
         }
     }
-    //console.log(matchID2015);
     for(let delivery of deliveries){
         if(matchID2015.includes(delivery.match_id) &&  !goodBowlers[delivery.bowler]){
             goodBowlers[delivery.bowler] = {
@@ -106,18 +180,16 @@ function goodBowler(deliveries, matches){
 function getTeamWinsOfstadium(matches){
     for(let match of matches){
         if(!teamStadWins[match.venue]){
-            teamStadWins[match.venue] = {
-                [match.winner] : 1
-            }
+            teamStadWins[match.venue] = {};
         }
-        else{
-            if(!teamStadWins[match.venue][match.winner]){
-                teamStadWins[match.venue][match.winner] = 1;
-            }
-            else{
-                teamStadWins[match.venue][match.winner] += 1;
-            }                                                                                                                                                                                                                         
+    }
+    for(let stad in teamStadWins){
+        for(let team of allteams){
+            teamStadWins[stad][team] = 0;
         }
+    }
+    for(let match of matches){
+        teamStadWins[match.venue][match.winner]++;
     }
     return teamStadWins;
 }
