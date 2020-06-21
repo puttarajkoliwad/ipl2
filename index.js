@@ -26,7 +26,6 @@ function main() {
       let preparedTeamExtras = prepareTeamExtras(rawData.extras);
       prepareTeamWinsPerSeason(rawData.winsPerTeamPerSeason);
       saveMatchesPlayedPerYear(result);
-      //console.log(jsonData);
     });
     });
 }
@@ -49,19 +48,7 @@ function prepareTeamWins(obj){
 }
 
 function prepareBowlers(obj){
-  let Bowlers = [];
-  for(let bowler in obj){
-    Bowlers.push({'name':bowler, 'economy':Number.parseFloat(obj[bowler].economy)});
-  }
-  Bowlers = Bowlers.sort((a, b) => {
-      return a.economy < b.economy?-1:1;
-  })
-  let filterBowlers = Bowlers.slice(0, 10);
-  jsonData.topBowlers2015 = {};
-  for(let bowler of filterBowlers){
-    jsonData.topBowlers2015[bowler['name']] = bowler['economy'];
-  }
-  //console.log(jsonData);
+  jsonData['economicalBowlers'] = obj;
 }
 
 function saveMatchesPlayedPerYear(result) {
