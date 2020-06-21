@@ -1,12 +1,18 @@
 let chosenYear = 0;
+let chosenYearEB = 2019;
 let dataLocal = {};
 function getYear(){
   const yr = document.getElementById('year').value;
   chosenYear = yr;
-  console.log('Year selected: ' + yr);
+  console.log('Year selected for Extra runs conceded: ' + yr);
   visualizeTeamExtras(dataLocal.teamExtras);
-  
-  
+}
+
+function getYearEB(){
+  const yr = document.getElementById('yearEB').value;
+  chosenYearEB = yr;
+  console.log('Year selected for economical Bowler: ' + yr);
+  visualizeBestBowlers2015(dataLocal.economicalBowlers[yr]);
 }
 
 function fetchAndVisualizeData() {
@@ -18,21 +24,17 @@ function fetchAndVisualizeData() {
 fetchAndVisualizeData();
 
 function visualizeData(data) {
-  
   dataLocal = data;
   visualizeMatchesPlayedPerYear(data.matchesPlayedPerYear);
   visualizeTeamWins(data.teamTotalWins);
-  visualizeBestBowlers2015(data.topBowlers2015);
+  visualizeBestBowlers2015(data.economicalBowlers['2019']);
   visualizeWinsPerTeamPerSeason(data.winsPerTeamPerSeason);
   visualizeSummary(data.stadiumWinsForTeams);
-  
-  //console.log(Object.keys(data));
   return;
 }
 
 
 function visualizeWinsPerTeamPerSeason(obj){
-  //console.log(obj);
   Highcharts.chart('wins-per-team-per-season', {
     chart: {
         type: 'column'
@@ -90,7 +92,7 @@ function visualizeSummary(obj){
   for(let team in teams){
     seriesData.push({'name': team, 'data':teams[team]})
   }
-  console.log(seriesData);
+  //console.log(seriesData);
 
   Highcharts.chart('summary-of-stadium-wins-for-each-team', {
     chart: {
@@ -184,7 +186,7 @@ function visualizeBestBowlers2015(topBowlers2015){
       type: "column"
     },
     title: {
-      text: "Most economical bowler of 2015"
+      text: "Most economical bowler of "+chosenYearEB
     },
     subtitle: {
       text:
