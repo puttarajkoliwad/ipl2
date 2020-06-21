@@ -13,7 +13,7 @@ let allteams = [];
 
 let bigData ={
     "teamTotalWins": 0,
-    'economicalBowlers': 0,
+    'economicalBowlers': {},
     'extras':0,
     'stadiumWinsForTeams': 0,
     'winsPerTeamPerSeason':{}
@@ -40,9 +40,9 @@ function prepareData(matches, deliveries){
         mapIdYears = yearIds(matches);
         getMatchId(matches)
         bigData["teamTotalWins"] = getTeamWins(matches);
-        bigData['economicalBowlers'] = goodBowler(deliveries, matches);
         bigData['extras'] = getSelectedYearsExtras(deliveries);
         bigData['winsPerTeamPerSeason'] = getWinsPerTeamPerSeason(matches);
+        bigData['economicalBowlers'] = goodBowler(deliveries);
         bigData['stadiumWinsForTeams'] = getTeamWinsOfstadium(matches);
         return bigData;
 }
@@ -145,35 +145,54 @@ function getTeamWins(matches){
     return teamWins;
 }
 
-function goodBowler(deliveries, matches){
-    let matchID2015 = [];
-    for(let mch of matches){
-        //console.log(mch.season);
-        if(mch.season == 2015){
-            matchID2015.push(mch.id);
-        }
+function goodBowler(deliveries){
+    let yearsBowler = {};
+    for(let year in mapIdYears){
+        yearsBowler[year] = {};
     }
     for(let delivery of deliveries){
-        if(matchID2015.includes(delivery.match_id) &&  !goodBowlers[delivery.bowler]){
-            goodBowlers[delivery.bowler] = {
-                "totalRunsConceded": 0,
-                "totalValidDeliveries":0,
-                'economy':0
-            }
-        }
-    }
-    bowlers = [...Object.keys(goodBowlers)];
-    for(let bowler of bowlers){
-        for(let delivery of deliveries){
-            if(matchID2015.includes(delivery.match_id) && bowler == delivery.bowler){
-                goodBowlers[bowler]["totalRunsConceded"] += Number.parseInt(delivery.total_runs);
-                if(delivery.ball < 7){
-                    goodBowlers[bowler]['totalValidDeliveries'] += 1;
+        for(let year in yearsBowler){
+            if(mapIdYears[year].includes(Number.parseInt(delivery.match_id))){
+                if(!yearsBowler[year][delivery.bowler]){
+                    yearsBowler[year][delivery.bowler] = {
+                        "totalRunsConceded": 0,
+                        "totalValidDeliveries":0,
+                        'economy':0
+                    }
+                }
+                else{
+                    yearsBowler[year][delivery.bowler]["totalRunsConceded"] += Number.parseInt(delivery.total_runs);
+                    if(delivery.ball < 7){
+                        yearsBowler[year][delivery.bowler]['totalValidDeliveries'] += 1;
+                    }
                 }
             }
         }
-        goodBowlers[bowler]['economy'] = ((goodBowlers[bowler]['totalRunsConceded']/goodBowlers[bowler]['totalValidDeliveries']) * 6).toFixed(2);
     }
+    for(let year in yearsBowler){
+        for(let bowler in yearsBowler[year]){
+            yearsBowler[year][bowler]['economy'] = ((yearsBowler[year][bowler]['totalRunsConceded']/yearsBowler[year][bowler]['totalValidDeliveries']) * 6).toFixed(2);
+        }
+    }
+    //console.log(yearsBowler);
+    for(let year in yearsBowler){
+        goodBowlers[year] = [];
+        for(let bowler in yearsBowler[year]){
+            goodBowlers[year].push({name: bowler, economy:Number.parseFloat(yearsBowler[year][bowler].economy)});
+        }
+        //console.log(goodBowlers);
+        goodBowlers[year].sort((a,b) =>{
+            return a.economy < b.economy?-1:1;
+        })
+        //console.log(goodBowlers)
+        goodBowlers[year].splice(10, goodBowlers[year].length);
+        let temp = goodBowlers[year];
+        goodBowlers[year] = {};
+        for(let bowler of temp){
+            goodBowlers[year][bowler.name] = bowler.economy;
+        }
+    }
+    //console.log(goodBowlers);
     return goodBowlers;
 }
 
