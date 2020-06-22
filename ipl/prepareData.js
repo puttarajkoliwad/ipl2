@@ -16,7 +16,34 @@ let bigData ={
     'economicalBowlers': {},
     'extras':0,
     'stadiumWinsForTeams': 0,
-    'winsPerTeamPerSeason':{}
+    'winsPerTeamPerSeason':{},
+    'momdata':[]
+}
+
+function manOfMatch(matches){
+    let mom = {};
+    for(let match of matches){
+        if(!mom[match.player_of_match]){
+            mom[match.player_of_match] = 1;
+        }
+        else{
+            mom[match.player_of_match]++;
+        }
+    }
+    let temp = [];
+    for(let player in mom){
+        temp.push({name:player, titlesNumber:mom[player]});
+    }
+    temp.sort((a,b) => {
+        return a.titlesNumber < b.titlesNumber?1:-1;
+    })
+    temp.splice(10, temp.length);
+    let momdata= [];
+    for(let player of temp){
+        momdata.push([player.name, player.titlesNumber]);
+    }
+    console.log(momdata);
+    return momdata;
 }
 
 function yearIds(matches){
@@ -44,6 +71,7 @@ function prepareData(matches, deliveries){
         bigData['winsPerTeamPerSeason'] = getWinsPerTeamPerSeason(matches);
         bigData['economicalBowlers'] = goodBowler(deliveries);
         bigData['stadiumWinsForTeams'] = getTeamWinsOfstadium(matches);
+        bigData['momdata'] = manOfMatch(matches);
         return bigData;
 }
 
