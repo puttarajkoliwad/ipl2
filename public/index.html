@@ -15,15 +15,51 @@
 <body>
     <h1>IPL Dataset visualization</h1></div><br/><br/>
     <div id="matches-played-per-year" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
-    
-    <div id="extra-runs-conceded-by-each-team-in-2016" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
 
+    <label for='yearEB'>Select Year</label>
+    <select name="economical_bowler_year" id="yearEB">
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+        <option value="2014">2014</option>
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+        <option value="2011">2011</option>
+        <option value="2010">2010</option>
+        <option value="2009">2009</option>
+        <option value="2008">2008</option>
+    </select>
+    <button onclick = "getYearEB()">submit</button>
     <div id="most-economical-bowler-2015" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
+    
     
     <div id="total-matches-won-by-each-team" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
   
-    <div id="summary-of-stadium-wins-for-each-team" style="min-width: 310px; height: 1200px; margin: 0; overflow:visible"></div>
+    <div id="wins-per-team-per-season" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
+    <label for='year'>Select Year</label>
+    <select name="extra_runs_year" id="year">
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+        <option value="2014">2014</option>
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+        <option value="2011">2011</option>
+        <option value="2010">2010</option>
+        <option value="2009">2009</option>
+        <option value="2008">2008</option>
+    </select>
+    <button onclick = "getYear()">submit</button>
     
+    <div id="extra-runs-conceded-by-each-team-in-2016" style="min-width: 310px; height: 800px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
+
+    <div id="summary-of-stadium-wins-for-each-team" style= "min-width: 310px; height:1200px; margin: 0 auto"></div><br/><hr/><br/><br/><br/>
+
+    <div id="mom" style= "min-width: 310px; height:500px; margin: 0 auto"></div>
 
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
