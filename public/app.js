@@ -1,4 +1,4 @@
-let chosenYear = 0;
+let chosenYear = 2019;
 let chosenYearEB = 2019;
 let dataLocal = {};
 function getYear(){
@@ -23,14 +23,71 @@ function fetchAndVisualizeData() {
 
 fetchAndVisualizeData();
 
+
+
 function visualizeData(data) {
   dataLocal = data;
   visualizeMatchesPlayedPerYear(data.matchesPlayedPerYear);
   visualizeTeamWins(data.teamTotalWins);
   visualizeBestBowlers2015(data.economicalBowlers['2019']);
   visualizeWinsPerTeamPerSeason(data.winsPerTeamPerSeason);
+  visualizeTeamExtras(dataLocal.teamExtras)
   visualizeSummary(data.stadiumWinsForTeams);
+  visualizeMOM(data.momdata);
   return;
+}
+
+
+function visualizeMOM(obj){
+  Highcharts.chart('mom', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Most MoM titles won over all the seasons'
+    },
+    subtitle: {
+        text: 'Source: <a href="https://www.kaggle.com/nowke9/ipldata/data">IPL Dataset</a></br></br>'
+    },
+    xAxis: {
+        type: 'category',
+        labels: {
+            rotation: -45,
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+            }
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Number of MOM titles awarded'
+        }
+    },
+    legend: {
+        enabled: false
+    },
+    tooltip: {
+        pointFormat: 'Total MOM titles: <b>{point.y:.0f}</b>'
+    },
+    series: [{
+        name: 'Number of MOM titles',
+        colorByPoint: true,
+        data: obj,
+        dataLabels: {
+            enabled: true,
+            rotation: -90,
+            align: 'right',
+            format: '{point.y:.0f}', // one decimal
+            y: 10, // 10 pixels down from the top
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+            }
+        }
+    }]
+});
 }
 
 
