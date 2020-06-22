@@ -25,11 +25,15 @@ function main() {
       let preparedStadiumTeamWins = prepareStadiumTeamWins(rawData.stadiumWinsForTeams);
       let preparedTeamExtras = prepareTeamExtras(rawData.extras);
       prepareTeamWinsPerSeason(rawData.winsPerTeamPerSeason);
+      momData(rawData.momdata);
       saveMatchesPlayedPerYear(result);
     });
     });
 }
 
+function momData(obj){
+  jsonData.momdata = obj;
+}
 
 function prepareTeamWinsPerSeason(obj){
   jsonData.winsPerTeamPerSeason = obj;
